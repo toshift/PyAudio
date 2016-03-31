@@ -1,3 +1,4 @@
+#coding: utf-8
 """PyAudio Example: Play a wave file."""
 
 import pyaudio
@@ -6,32 +7,44 @@ import sys
 
 CHUNK = 1024
 
-if len(sys.argv) < 2:
-    print("Plays a wave file.\n\nUsage: %s filename.wav" % sys.argv[0])
-    sys.exit(-1)
+def printWaveInfo(wf):
+    """WAVEファイルの情報を取得"""
+    print "チャンネル数:", wf.getnchannels()
+    print "サンプル幅:", wf.getsampwidth()
+    print "サンプリング周波数:", wf.getframerate()
+    print "フレーム数:", wf.getnframes()
+    print "パラメータ:", wf.getparams()
+    print "長さ（秒）:", float(wf.getnframes()) / wf.getframerate()
 
-wf = wave.open(sys.argv[1], 'rb')
 
-# instantiate PyAudio (1)
-p = pyaudio.PyAudio()
+if __name__ == '__main__':
 
-# open stream (2)
-stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
-                channels=wf.getnchannels(),
-                rate=wf.getframerate(),
-                output=True)
+    if len(sys.argv) < 2:
+        print("Plays a wave file.\n\nUsage: %s filename.wav" % sys.argv[0])
+        sys.exit(-1)
 
-# read data
-data = wf.readframes(CHUNK)
+    wf = wave.open(sys.argv[1], 'rb')
+    printWaveInfo(wf)
+    # instantiate PyAudio (1)
+    p = pyaudio.PyAudio()
 
-# play stream (3)
-while len(data) > 0:
-    stream.write(data)
-    data = wf.readframes(CHUNK)
+    # open stream (2)
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    output=True)
 
-# stop stream (4)
-stream.stop_stream()
-stream.close()
+    # read data
+    data = wf.readframes(wf.getnframes())
 
-# close PyAudio (5)
-p.terminate()
+    # play stream (3)
+    while len(data) > 0:
+        stream.write(data)
+        data = wf.readframes(CHUNK)
+
+    # stop stream (4)
+    stream.stop_stream()
+    stream.close()
+
+    # close PyAudio (5)
+    p.terminate()
