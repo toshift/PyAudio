@@ -35,7 +35,7 @@ if __name__ == '__main__':
                     output=True)
 
     # read data
-    data = wf.readframes(wf.getnframes())
+    data = wf.readframes(CHUNK)
 
     # play stream (3)
     while len(data) > 0:
